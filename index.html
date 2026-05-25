@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Bite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ══ ROLE SELECT ══ -->
+    <div id="roleScreen">
+        <div class="rs-logo">Campus<span>Bite</span></div>
+        <div class="rs-sub">CAMPUS FOOD ORDERING PLATFORM</div>
+        <div class="rs-cards">
+            <div class="rs-card" onclick="enterAs('user')">
+                <div class="rc-icon">🎒</div>
+                <div class="rc-title">I'm a Student</div>
+                <div class="rc-desc">Browse menu, place orders<br>& track your food</div>
+            </div>
+            <div class="rs-card" onclick="enterAs('vendor')">
+                <div class="rc-icon">🍳</div>
+                <div class="rc-title">I'm a Vendor</div>
+                <div class="rc-desc">View & manage incoming<br>orders by order code</div>
+            </div>
+            <div class="rs-card" onclick="enterAs('admin')">
+                <div class="rc-icon">⚙️</div>
+                <div class="rc-title">Admin Panel</div>
+                <div class="rc-desc">Manage menu items,<br>view all orders & stats</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ NAV ══ -->
+    <nav id="mainNav" style="display:none;">
+        <div class="nav-in">
+            <div class="logo" onclick="goHome()">Campus<span>Bite</span></div>
+            <div class="nav-right">
+                <span class="role-tag" id="roleTag"></span>
+                <button class="nav-pill" onclick="goHome()">🔀 Switch Role</button>
+                <button class="cart-fab" id="cartFab" onclick="openCart()" style="display:none;">
+        🛒 Cart <span class="badge" id="cartCount">0</span>
+      </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ USER PORTAL ══ -->
+    <div id="userPortal">
+        <div class="hero">
+            <div>
+                <h1>Fresh Food,<br><em>Fast Delivery</em><br>On Campus.</h1>
+                <p>Hot meals, snacks & drinks delivered to your hostel or picked up at the counter — made fresh every order.</p>
+                <div class="chips">
+                    <div class="chip on" onclick="filterCat('all',this)">🍽 All</div>
+                    <div class="chip" onclick="filterCat('meals',this)">🍱 Meals</div>
+                    <div class="chip" onclick="filterCat('snacks',this)">🥙 Snacks</div>
+                    <div class="chip" onclick="filterCat('drinks',this)">🥤 Drinks</div>
+                    <div class="chip" onclick="filterCat('desserts',this)">🍮 Desserts</div>
+                </div>
+            </div>
+            <div class="hero-img">
+                <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=700&q=80" alt="food">
+                <div class="hbadge">
+                    <div class="hb-ic">⚡</div>
+                    <div>
+                        <div class="hb-t">Avg delivery</div>
+                        <div class="hb-v">~20 mins</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec">
+            <div class="sec-hd">
+                <div class="sec-title">Today's Menu</div>
+                <span class="sec-ct" id="itemCt">— items</span>
+            </div>
+            <div class="food-grid" id="foodGrid"></div>
+        </div>
+    </div>
+
+    <!-- ══ VENDOR PORTAL ══ -->
+    <div id="vendorPortal">
+        <div class="vp-title">Vendor Dashboard</div>
+        <div class="vp-sub">Look up a student's order using their order code, or view all live orders below.</div>
+
+        <div class="lookup-box">
+            <div class="lb-title">🔍 Look Up Order by Code</div>
+            <div class="lb-sub">Enter the 6-digit code the student shows you at the counter.</div>
+            <div class="lb-row">
+                <input type="text" id="lookupInput" placeholder="e.g.  CB-847291" maxlength="10" oninput="this.value=this.value.toUpperCase()">
+                <button class="lb-btn" onclick="lookupOrder()">Find Order</button>
+            </div>
+            <div class="lb-err" id="lookupErr">❌ No order found with that code. Please check and try again.</div>
+        </div>
+
+        <div id="lookupResult"></div>
+
+        <div class="sec-hd" style="margin-bottom:14px;">
+            <div class="sec-title">📋 All Live Orders</div>
+            <span class="sec-ct" id="liveOrderCt">0 orders</span>
+        </div>
+        <div class="vp-orders-grid" id="vendorOrdersList">
+            <div class="vp-empty">
+                <div class="ve-ico">📭</div>
+                <p>No orders yet. Waiting for students...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ ADMIN PORTAL ══ -->
+    <div id="adminPortal">
+        <div class="ap-header">
+            <div class="ap-title">⚙ Admin Panel</div>
+        </div>
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-lbl">Total Orders</div>
+                <div class="stat-val" id="st0">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Revenue (₹)</div>
+                <div class="stat-val" id="st1">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Menu Items</div>
+                <div class="stat-val" id="st2">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Platform Fees</div>
+                <div class="stat-val" id="st3">₹0</div>
+            </div>
+        </div>
+        <div class="ap-tabs">
+            <button class="at on" onclick="aTab('menu',this)">📋 Menu Items</button>
+            <button class="at" onclick="aTab('orders',this)">📦 All Orders</button>
+            <button class="at" onclick="aTab('add',this)">➕ Add Item</button>
+        </div>
+        <div id="aTabMenu"></div>
+        <div id="aTabOrders" style="display:none;"></div>
+        <div id="aTabAdd" style="display:none;"></div>
+        <div id="aEditWrap" style="display:none;margin-top:16px;"></div>
+    </div>
+
+    <!-- ══ CART OVERLAY & PANEL ══ -->
+    <div class="c-ov" id="cOv" onclick="closeCart()"></div>
+    <div class="c-panel" id="cPanel">
+        <!-- Main cart -->
+        <div id="cMain" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+            <div class="c-hd">
+                <h2>🛒 Your Cart</h2>
+                <button class="xbtn" onclick="closeCart()">✕</button>
+            </div>
+            <div class="c-items" id="cItems"></div>
+            <div class="c-foot" id="cFoot">
+                <div class="c-row"><span>Subtotal</span><span id="cSub">₹0</span></div>
+                <div class="c-row or"><span>Platform Fee (₹10 × <span id="cFeeQty">0</span>)</span><span id="cFee">₹0</span></div>
+                <div class="c-row bold" style="margin-top:7px;padding-top:7px;border-top:1.5px solid var(--border);"><span>Total</span><span id="cTot">₹0</span></div>
+                <button class="c-cta" onclick="showInvoice()">View Invoice & Checkout →</button>
+            </div>
+        </div>
+        <!-- Invoice view -->
+        <div id="invView">
+            <div class="c-hd">
+                <div>
+                    <div style="font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1px;text-transform:uppercase;">Invoice</div>
+                    <h2>Order Summary</h2>
+                </div>
+                <button class="xbtn" onclick="backToCart()">←</button>
+            </div>
+            <div class="inv-sec">
+                <div class="inv-label">Billed To</div>
+                <div style="font-size:13px;">Campus Student — Walk-in / Delivery</div>
+                <div style="font-size:11px;color:var(--muted);">Campus Bite · Campus Canteen</div>
+            </div>
+            <div class="inv-sec" id="invItemsSection"></div>
+            <div class="inv-sec">
+                <div class="inv-label">Charges</div>
+                <div class="inv-row"><span>Food Subtotal</span><span id="invSub">₹0</span></div>
+                <div id="invFeeRows"></div>
+                <div class="pfee-note"><strong>Platform fee ₹10 per product</strong> — covers payment processing & order management.</div>
+            </div>
+            <div class="inv-sec">
+                <div class="inv-row tot"><span>Grand Total</span><span id="invTot" style="color:var(--or);">₹0</span></div>
+            </div>
+            <!-- Payment Method -->
+            <div class="checkout-section">
+                <div class="checkout-label">💳 Payment Method</div>
+                <div class="pay-options">
+                    <label class="pay-opt selected" id="pay_upi">
+          <input type="radio" name="payMethod" value="upi" checked onchange="selectPay(this)">
+          <div class="pay-opt-icon">📱</div>
+          <div class="pay-opt-info">
+            <div class="pay-opt-name">UPI <span class="pay-badge">Recommended</span></div>
+            <div class="pay-opt-desc">GPay, PhonePe, Paytm, BHIM</div>
+          </div>
+        </label>
+                    <label class="pay-opt" id="pay_card">
+          <input type="radio" name="payMethod" value="card" onchange="selectPay(this)">
+          <div class="pay-opt-icon">💳</div>
+          <div class="pay-opt-info">
+            <div class="pay-opt-name">Credit / Debit Card</div>
+            <div class="pay-opt-desc">Visa, Mastercard, RuPay</div>
+          </div>
+        </label>
+                    <label class="pay-opt" id="pay_cod">
+          <input type="radio" name="payMethod" value="cod" onchange="selectPay(this)">
+          <div class="pay-opt-icon">💵</div>
+          <div class="pay-opt-info">
+            <div class="pay-opt-name">Cash on Delivery</div>
+            <div class="pay-opt-desc">Pay at counter / delivery</div>
+          </div>
+        </label>
+                </div>
+            </div>
+            <!-- Pickup / Delivery Time Slot -->
+            <div class="checkout-section">
+                <div class="checkout-label">🕐 Pick a Time Slot</div>
+                <div class="slot-grid slot-scroll" id="slotGrid"></div>
+                <div style="font-size:11px;color:var(--muted);margin-top:8px;">Select your preferred pickup / delivery time</div>
+            </div>
+            <div style="padding:0 22px 8px;">
+                <button class="c-cta" onclick="placeOrder()">✓ Confirm & Place Order</button>
+            </div>
+            <div style="padding:10px 22px 22px;text-align:center;font-size:10px;color:var(--muted);">Campus Bite · Campus Canteen Tech · Terms apply</div>
+        </div>
+    </div>
+
+    <!-- ══ ORDER PLACED MODAL ══ -->
+    <div class="modal-ov" id="successMod">
+        <div class="modal">
+            <div class="modal-ico">🎉</div>
+            <h3>Order Placed!</h3>
+            <p>Show this code to the vendor at the counter or share it for delivery confirmation.</p>
+            <div class="code-display">
+                <div class="cd-label">Your Order Code</div>
+                <div class="cd-code" id="modCode">CB-000000</div>
+                <div class="cd-hint">Show this at the counter</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:16px;">
+                <div style="flex:1;background:var(--or-lt);border-radius:11px;padding:10px 12px;text-align:center;">
+                    <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Payment</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--or);" id="modPayMethod">UPI</div>
+                </div>
+                <div style="flex:1;background:#E8F8F0;border-radius:11px;padding:10px 12px;text-align:center;">
+                    <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Time Slot</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--grn);" id="modSlot">—</div>
+                </div>
+            </div>
+            <button class="bp" style="width:100%;padding:13px;font-size:14px;" onclick="closeMod()">Done ✓</button>
+        </div>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
